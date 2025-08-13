@@ -1,78 +1,464 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Home Page with EmailJS</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Management | Register</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: Arial, sans-serif; background: #f7f8fb; margin: 0; }
-    .container { max-width: 900px; margin: auto; padding: 20px; }
-    header, footer { text-align: center; padding: 10px; background: #0b5cff; color: white; }
-    nav a { color: white; margin: 0 10px; text-decoration: none; }
-    .btn { padding: 10px 15px; background: #0b5cff; color: white; border: none; cursor: pointer; }
-    .btn:hover { background: #0846b8; }
-    form input, form textarea { width: 100%; padding: 10px; margin-bottom: 10px; }
-    form textarea { resize: vertical; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a3a5f 0%, #2c5282 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .header {
+      background: linear-gradient(to right, #2563eb, #3b82f6);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .logo-icon {
+      font-size: 2.5rem;
+      margin-right: 12px;
+    }
+
+    .logo-text {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 1.05rem;
+      opacity: 0.9;
+    }
+
+    .form-container {
+      padding: 30px;
+    }
+
+    .input-group {
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+      font-size: 1.05rem;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      top: 42px;
+      color: #4b5563;
+      font-size: 1.2rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 15px 15px 45px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .password-container {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      cursor: pointer;
+      color: #6b7280;
+      font-size: 1.2rem;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(to right, #2563eb, #3b82f6);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 1.05rem;
+      color: #4b5563;
+    }
+
+    .login-link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-left: 5px;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.4s ease;
+    }
+
+    .alert.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .alert.success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .alert.error {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .alert i {
+      margin-right: 12px;
+      font-size: 1.4rem;
+    }
+
+    .password-strength {
+      height: 4px;
+      background: #e5e7eb;
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .strength-meter {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        max-width: 100%;
+        border-radius: 12px;
+      }
+      
+      .header {
+        padding: 25px 15px;
+      }
+      
+      .form-container {
+        padding: 25px 20px;
+      }
+      
+      .logo-text {
+        font-size: 1.8rem;
+      }
+      
+      .header h1 {
+        font-size: 1.6rem;
+      }
+      
+      .input-group input {
+        padding: 14px 14px 14px 42px;
+      }
+      
+      .input-icon {
+        top: 39px;
+        font-size: 1.1rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>MySite</h1>
-    <nav>
-      <a href="#home">Home</a>
-      <a href="#features">Features</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
-
   <div class="container">
-    <section id="home">
-      <h2>Welcome</h2>
-      <p>This is a simple home page with EmailJS integration.</p>
-    </section>
-
-    <section id="contact">
-      <h2>Contact Me</h2>
-      <form id="contactForm">
-        <input type="text" name="from_name" placeholder="Your Name" required>
-        <input type="email" name="reply_to" placeholder="Your Email" required>
-        <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
-        <button class="btn" type="submit">Send Message</button>
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="logo-text">ExpensePro</div>
+      </div>
+      <h1>Create Your Account</h1>
+      <p>Register to start managing your expenses</p>
+    </div>
+    
+    <div class="form-container">
+      <div id="alertBox"></div>
+      
+      <form id="registrationForm">
+        <div class="input-group">
+          <label for="name">Full Name</label>
+          <div class="input-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <input type="text" id="name" placeholder="Enter your full name" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="email">Email Address</label>
+          <div class="input-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <input type="email" id="email" placeholder="Enter your email" required>
+        </div>
+        
+        <div class="input-group">
+          <label for="password">Password</label>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div class="password-container">
+            <input type="password" id="password" placeholder="Create a password" required>
+            <span class="toggle-password" onclick="togglePassword()">
+              <i class="fas fa-eye"></i>
+            </span>
+          </div>
+          <div class="password-strength">
+            <div class="strength-meter" id="strengthMeter"></div>
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div class="password-container">
+            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+            <span class="toggle-password" onclick="toggleConfirmPassword()">
+              <i class="fas fa-eye"></i>
+            </span>
+          </div>
+        </div>
+        
+        <button type="button" class="btn-submit" onclick="registerUser()">
+          <i class="fas fa-user-plus"></i> Register Account
+        </button>
       </form>
-      <p id="status"></p>
-    </section>
+      
+      <div class="login-link">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
   </div>
 
-  <footer>
-    &copy; <span id="year"></span> MySite — Built with ♥
-  </footer>
-
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    // Initialize EmailJS with your Public Key
-    emailjs.init("fmqcIYpRVTqu9cMgI"); // Replace with your EmailJS public key
-
-    // Form submission handler
-    document.getElementById("contactForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const serviceID = "service_o2qdlgt"; // Replace with your Service ID
-      const templateID = "template_vf8t7bn"; // Replace with your Template ID
-
-      emailjs.sendForm(serviceID, templateID, this)
-        .then(() => {
-          document.getElementById("status").textContent = "✅ Message sent successfully!";
-          this.reset();
-        }, (err) => {
-          document.getElementById("status").textContent = "❌ Failed to send message. Try again.";
-          console.error("EmailJS Error:", err);
-        });
+    // DOM elements
+    const alertBox = document.getElementById('alertBox');
+    const passwordInput = document.getElementById('password');
+    const strengthMeter = document.getElementById('strengthMeter');
+    
+    // Show alert message
+    function showAlert(message, type) {
+      alertBox.innerHTML = `
+        <div class="alert ${type} show">
+          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+          ${message}
+        </div>
+      `;
+      
+      // Auto hide after 5 seconds
+      if (type === 'success') {
+        setTimeout(() => {
+          alertBox.innerHTML = '';
+        }, 5000);
+      }
+    }
+    
+    // Toggle password visibility
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const icon = document.querySelector('.toggle-password i');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+    
+    // Toggle confirm password visibility
+    function toggleConfirmPassword() {
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+      const icon = document.querySelectorAll('.toggle-password i')[1];
+      
+      if (confirmPasswordInput.type === 'password') {
+        confirmPasswordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        confirmPasswordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+    
+    // Password strength indicator
+    passwordInput.addEventListener('input', function() {
+      const password = this.value;
+      let strength = 0;
+      
+      // Check password length
+      if (password.length >= 8) strength += 25;
+      
+      // Check for lowercase letters
+      if (/[a-z]/.test(password)) strength += 25;
+      
+      // Check for uppercase letters
+      if (/[A-Z]/.test(password)) strength += 25;
+      
+      // Check for numbers and special characters
+      if (/[0-9]/.test(password)) strength += 15;
+      if (/[^A-Za-z0-9]/.test(password)) strength += 10;
+      
+      // Update strength meter
+      strengthMeter.style.width = strength + '%';
+      
+      // Update color based on strength
+      if (strength < 50) {
+        strengthMeter.style.backgroundColor = '#ef4444';
+      } else if (strength < 75) {
+        strengthMeter.style.backgroundColor = '#f59e0b';
+      } else {
+        strengthMeter.style.backgroundColor = '#10b981';
+      }
     });
-
-    // Current year in footer
-    document.getElementById("year").textContent = new Date().getFullYear();
+    
+    // Register user function
+    function registerUser() {
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+      
+      // Validate inputs
+      if (!name || !email || !password || !confirmPassword) {
+        showAlert("Please fill in all fields", "error");
+        return;
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showAlert("Please enter a valid email address", "error");
+        return;
+      }
+      
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        showAlert("Passwords do not match. Please try again.", "error");
+        return;
+      }
+      
+      // Validate password strength
+      if (password.length < 8) {
+        showAlert("Password must be at least 8 characters long", "error");
+        return;
+      }
+      
+      // Show loading state
+      const submitBtn = document.querySelector('.btn-submit');
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+      submitBtn.disabled = true;
+      
+      // Simulate registration process (in a real app, this would be an API call)
+      setTimeout(() => {
+        // Show success message
+        showAlert("🎉 Account created successfully! Redirecting to login...", "success");
+        
+        // Reset form
+        document.getElementById("registrationForm").reset();
+        strengthMeter.style.width = '0%';
+        
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 2000);
+        
+        // Reset button
+        submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Register Account';
+        submitBtn.disabled = false;
+      }, 1500);
+    }
   </script>
 </body>
 </html>
