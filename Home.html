@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ExpensePro - Financial Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #3b82f6;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gray: #64748b;
+      --light-gray: #e2e8f0;
+      --card-bg: #ffffff;
+      --sidebar-bg: linear-gradient(to bottom, var(--primary), var(--secondary));
+      --header-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      --hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: var(--dark);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 250px;
+      background: var(--sidebar-bg);
+      color: white;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      transition: all 0.3s ease;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .logo-icon {
+      font-size: 28px;
+      margin-right: 10px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 0 15px;
+      flex: 1;
+    }
+
+    .nav-item {
+      margin-bottom: 5px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .nav-link i {
+      font-size: 20px;
+      margin-right: 12px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .nav-text {
+      font-size: 16px;
+    }
+
+    .logout-container {
+      padding: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: left;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-logout i {
+      margin-right: 12px;
+      font-size: 18px;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: var(--card-bg);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--header-shadow);
+      z-index: 10;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-profile {
+      position: relative;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .profile-img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    .profile-name {
+      font-weight: 500;
+      margin-right: 8px;
+    }
+
+    /* Content Area */
+    .content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      background: #f1f5f9;
+    }
+
+    /* Dashboard Grid */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      padding: 25px;
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--hover-shadow);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+    }
+
+    .bg-primary {
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+    }
+
+    .bg-success {
+      background: linear-gradient(to right, var(--success), #34d399);
+    }
+
+    .bg-warning {
+      background: linear-gradient(to right, var(--warning), #fbbf24);
+    }
+
+    .bg-danger {
+      background: linear-gradient(to right, var(--danger), #f87171);
+    }
+
+    .card-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .card-text {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .chart-container {
+      height: 250px;
+      margin-top: 15px;
+    }
+
+    /* Expense Form */
+    .form-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .form-header {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid var(--light-gray);
+    }
+
+    .form-header h2 {
+      font-size: 24px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .input-group {
+      margin-bottom: 22px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 16px;
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid var(--light-gray);
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s;
+      outline: none;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+      box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Table Styles */
+    .table-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      padding: 25px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .table-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--light-gray);
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--gray);
+      background-color: rgba(226, 232, 240, 0.3);
+    }
+
+    tr:hover {
+      background-color: rgba(226, 232, 240, 0.2);
+    }
+
+    .status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .status-paid {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .status-pending {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .action-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary);
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-right: 5px;
+    }
+
+    .action-btn:hover {
+      background: rgba(37, 99, 235, 0.2);
+    }
+
+    /* User Profile */
+    .profile-container {
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--light-gray);
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 36px;
+      margin-right: 25px;
+    }
+
+    .profile-info h2 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    .profile-info p {
+      color: var(--gray);
+    }
+
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: rgba(226, 232, 240, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .alert {
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.4s;
+    }
+
+    .alert.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .alert.success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .alert.error {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .alert i {
+      margin-right: 12px;
+      font-size: 24px;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 70px;
+      }
+      .logo-text, .nav-text {
+        display: none;
+      }
+      .logo {
+        justify-content: center;
+        padding-bottom: 15px;
+      }
+      .logo-icon {
+        margin-right: 0;
+      }
+      .nav-link {
+        justify-content: center;
+        padding: 15px;
+      }
+      .nav-link i {
+        margin-right: 0;
+        font-size: 22px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 15px;
+      }
+      .content {
+        padding: 15px;
+      }
+      .profile-name {
+        display: none;
+      }
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-container, .profile-container {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+      .main-content {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="logo-text">ExpensePro</div>
+    </div>
+    
+    <ul class="nav-menu">
+      <li class="nav-item">
+        <a href="#" class="nav-link active" data-page="dashboard">
+          <i class="fas fa-home"></i>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="add-expense">
+          <i class="fas fa-plus-circle"></i>
+          <span class="nav-text">Add Expense</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="view-expenses">
+          <i class="fas fa-list"></i>
+          <span class="nav-text">View Expenses</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="user-profile">
+          <i class="fas fa-user"></i>
+          <span class="nav-text">User Profile</span>
+        </a>
+      </li>
+    </ul>
+    
+    <div class="logout-container">
+      <button class="btn-logout" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="nav-text">Logout</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="header">
+      <div class="page-title">
+        <i class="fas fa-home"></i> <span id="pageTitle">Dashboard</span>
+      </div>
+      
+      <div class="user-profile">
+        <div class="profile-img" id="profileInitials">U</div>
+        <div class="profile-name" id="profileName">Loading...</div>
+        <i class="fas fa-caret-down"></i>
+      </div>
+    </div>
+    
+    <!-- Content Area -->
+    <div class="content">
+      <!-- Dashboard Page -->
+      <div class="page active" id="dashboard">
+        <div id="alertBox"></div>
+        
+        <!-- Stats Cards -->
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Total Expenses</div>
+                <div class="card-value" id="totalExpenses">₹0.00</div>
+                <div class="card-text" id="expenseTrend">Loading...</div>
+              </div>
+              <div class="card-icon bg-danger">
+                <i class="fas fa-arrow-up"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Monthly Average</div>
+                <div class="card-value" id="monthlyAverage">₹0.00</div>
+                <div class="card-text">Average per month</div>
+              </div>
+              <div class="card-icon bg-primary">
+                <i class="fas fa-calculator"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Top Category</div>
+                <div class="card-value" id="topCategory">-</div>
+                <div class="card-text">Your most frequent expense</div>
+              </div>
+              <div class="card-icon bg-warning">
+                <i class="fas fa-star"></i>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Transactions</div>
+                <div class="card-value" id="totalTransactions">0</div>
+                <div class="card-text">Total expenses recorded</div>
+              </div>
+              <div class="card-icon bg-success">
+                <i class="fas fa-receipt"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="dashboard-grid">
+          <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+              <div class="card-title">Expense Overview</div>
+            </div>
+            <div class="chart-container">
+              <canvas id="expenseChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Expense Distribution</div>
+            </div>
+            <div class="chart-container">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Add Expense Page -->
+      <div class="page" id="add-expense">
+        <div class="form-container">
+          <div class="form-header">
+            <h2><i class="fas fa-plus-circle"></i> Add New Expense</h2>
+          </div>
+          
+          <form id="expenseForm">
+            <div class="input-group">
+              <label for="title">Title</label>
+              <input type="text" id="title" placeholder="Enter expense title" required>
+            </div>
+            
+            <div class="input-group">
+              <label for="amount">Amount (₹)</label>
+              <input type="number" id="amount" placeholder="Enter amount" min="0" step="0.01" required>
+            </div>
+            
+            <div class="input-group">
+              <label for="category">Category</label>
+              <select id="category" required>
+                <option value="">Select a category</option>
+                <option value="Food">Food & Dining</option>
+                <option value="Transportation">Transportation</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Housing">Housing</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Education">Education</option>
+                <option value="Travel">Travel</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div class="input-group">
+              <label for="date">Date</label>
+              <input type="date" id="date" required>
+            </div>
+            
+            <div class="input-group">
+              <label for="notes">Notes (Optional)</label>
+              <textarea id="notes" rows="3" placeholder="Add any additional details"></textarea>
+            </div>
+            
+            <button type="button" class="btn-submit" id="submitExpense">
+              <i class="fas fa-paper-plane"></i> Add Expense
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- View Expenses Page -->
+      <div class="page" id="view-expenses">
+        <div class="table-container">
+          <div class="table-header">
+            <div class="table-title">Your Expenses</div>
+            <div class="filters">
+              <select id="expenseFilter">
+                <option value="all">All Expenses</option>
+                <option value="month">This Month</option>
+                <option value="week">This Week</option>
+                <option value="today">Today</option>
+              </select>
+            </div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expensesTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center;">Loading expenses...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- User Profile Page -->
+      <div class="page" id="user-profile">
+        <div class="profile-container">
+          <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">U</div>
+            <div class="profile-info">
+              <h2 id="userFullName">Loading...</h2>
+              <p id="userEmail">user@example.com</p>
+              <p id="joinDate">Member since: Loading...</p>
+            </div>
+          </div>
+          
+          <div class="profile-stats">
+            <div class="stat-card">
+              <div class="stat-value" id="profileTotalExpenses">₹0.00</div>
+              <div class="stat-label">Total Expenses</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="profileMonthlyAvg">₹0.00</div>
+              <div class="stat-label">Monthly Average</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="profileTransactions">0</div>
+              <div class="stat-label">Transactions</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="profileCategories">0</div>
+              <div class="stat-label">Categories</div>
+            </div>
+          </div>
+          
+          <div class="form-header">
+            <h2><i class="fas fa-user-cog"></i> Update Profile</h2>
+          </div>
+          
+          <form id="profileForm">
+            <div class="input-group">
+              <label for="fullName">Full Name</label>
+              <input type="text" id="fullName" placeholder="Enter your full name">
+            </div>
+            
+            <div class="input-group">
+              <label for="profileEmail">Email</label>
+              <input type="email" id="profileEmail" placeholder="Enter your email" disabled>
+            </div>
+            
+            <div class="input-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" placeholder="Enter your phone number">
+            </div>
+            
+            <button type="button" class="btn-submit" id="updateProfile">
+              <i class="fas fa-save"></i> Update Profile
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Supabase configuration
+    const SUPABASE_URL = 'https://cbhgbhwhjoazfdtuuiwf.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiaGdiaHdoam9hemZkdHV1aXdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MjI2NTgsImV4cCI6MjA2OTI5ODY1OH0.4GPOqE26Tm5wL58fYEBi5Kmx0EL4ogOzHa0YJnvDK38';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // DOM elements
+    const alertBox = document.getElementById('alertBox');
+    const profileInitials = document.getElementById('profileInitials');
+    const profileAvatar = document.getElementById('profileAvatar');
+    const profileName = document.getElementById('profileName');
+    const userFullName = document.getElementById('userFullName');
+    const userEmail = document.getElementById('userEmail');
+    const profileEmail = document.getElementById('profileEmail');
+    const joinDate = document.getElementById('joinDate');
+    const pageTitle = document.getElementById('pageTitle');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const submitExpenseBtn = document.getElementById('submitExpense');
+    const updateProfileBtn = document.getElementById('updateProfile');
+    const expensesTableBody = document.getElementById('expensesTableBody');
+    
+    // Global variables
+    let currentUser = null;
+    let userExpenses = [];
+    let expenseChart = null;
+    let categoryChart = null;
+    
+    // Initialize the application
+    async function initApp() {
+      // Get user email from localStorage
+      const userEmail = localStorage.getItem("user_email");
+      
+      if (!userEmail) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Set today's date as default in expense form
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('date').value = today;
+      
+      // Load user data
+      await loadUserData(userEmail);
+      
+      // Load user expenses
+      await loadExpenses(userEmail);
+      
+      // Initialize charts
+      initCharts();
+      
+      // Populate expenses table
+      populateExpensesTable();
+      
+      // Update profile page
+      updateProfilePage();
+      
+      // Update dashboard stats
+      updateDashboardStats();
+    }
+    
+    // Load user data from Supabase
+    async function loadUserData(email) {
+      try {
+        const { data, error } = await supabase
+          .from('user_mst')
+          .select('*')
+          .eq('email', email)
+          .single();
+
+        if (error) throw error;
+        
+        currentUser = data;
+        
+        // Set user info in UI
+        const userName = data.name || "User";
+        const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        
+        profileInitials.textContent = initials;
+        profileAvatar.textContent = initials;
+        profileName.textContent = userName;
+        userFullName.textContent = userName;
+        userEmail.textContent = email;
+        profileEmail.value = email;
+        
+        // Format join date
+        if (data.created_at) {
+          const joinDateObj = new Date(data.created_at);
+          joinDate.textContent = `Member since: ${joinDateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+        }
+        
+        // Set form values
+        document.getElementById('fullName').value = userName;
+        if (data.phone) document.getElementById('phone').value = data.phone;
+        
+      } catch (error) {
+        showAlert(`Error loading user data: ${error.message}`, "error");
+      }
+    }
+    
+    // Load expenses from Supabase
+    async function loadExpenses(email) {
+      try {
+        const { data, error } = await supabase
+          .from('expenses_mst')
+          .select('*')
+          .eq('user_email', email)
+          .order('expense_date', { ascending: false });
+
+        if (error) throw error;
+        
+        userExpenses = data || [];
+        
+      } catch (error) {
+        showAlert(`Error loading expenses: ${error.message}`, "error");
+      }
+    }
+    
+    // Update dashboard stats
+    function updateDashboardStats() {
+      if (userExpenses.length === 0) return;
+      
+      // Calculate total expenses
+      const totalExpenses = userExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+      document.getElementById('totalExpenses').textContent = `₹${totalExpenses.toFixed(2)}`;
+      document.getElementById('profileTotalExpenses').textContent = `₹${totalExpenses.toFixed(2)}`;
+      
+      // Calculate number of transactions
+      document.getElementById('totalTransactions').textContent = userExpenses.length;
+      document.getElementById('profileTransactions').textContent = userExpenses.length;
+      
+      // Calculate monthly average
+      const firstExpenseDate = new Date(userExpenses[userExpenses.length - 1].expense_date);
+      const monthsDiff = (new Date() - firstExpenseDate) / (1000 * 60 * 60 * 24 * 30);
+      const monthlyAverage = totalExpenses / Math.max(1, monthsDiff);
+      document.getElementById('monthlyAverage').textContent = `₹${monthlyAverage.toFixed(2)}`;
+      document.getElementById('profileMonthlyAvg').textContent = `₹${monthlyAverage.toFixed(2)}`;
+      
+      // Find top category
+      const categoryCount = {};
+      userExpenses.forEach(expense => {
+        categoryCount[expense.category] = (categoryCount[expense.category] || 0) + 1;
+      });
+      
+      const topCategory = Object.keys(categoryCount).reduce((a, b) => 
+        categoryCount[a] > categoryCount[b] ? a : b
+      );
+      
+      document.getElementById('topCategory').textContent = topCategory;
+      document.getElementById('profileCategories').textContent = Object.keys(categoryCount).length;
+      
+      // Expense trend
+      const lastMonthExpenses = userExpenses.filter(expense => {
+        const expenseDate = new Date(expense.expense_date);
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        return expenseDate > oneMonthAgo;
+      }).reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+      
+      const prevMonthExpenses = totalExpenses - lastMonthExpenses;
+      const trend = lastMonthExpenses > prevMonthExpenses ? "increase" : "decrease";
+      const trendPercentage = prevMonthExpenses > 0 ? 
+        Math.abs(((lastMonthExpenses - prevMonthExpenses) / prevMonthExpenses) * 100).toFixed(1) : 
+        "N/A";
+      
+      document.getElementById('expenseTrend').textContent = 
+        trend === "increase" ? 
+        `↑ ${trendPercentage}% from previous period` : 
+        `↓ ${trendPercentage}% from previous period`;
+    }
+    
+    // Initialize charts
+    function initCharts() {
+      // Destroy existing charts if they exist
+      if (expenseChart) expenseChart.destroy();
+      if (categoryChart) categoryChart.destroy();
+      
+      // Expense Overview Chart
+      const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+      
+      // Group expenses by month
+      const monthlyExpenses = {};
+      userExpenses.forEach(expense => {
+        const date = new Date(expense.expense_date);
+        const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+        
+        if (!monthlyExpenses[monthYear]) {
+          monthlyExpenses[monthYear] = 0;
+        }
+        
+        monthlyExpenses[monthYear] += parseFloat(expense.amount);
+      });
+      
+      const sortedMonths = Object.keys(monthlyExpenses).sort((a, b) => 
+        new Date(a.split(' ')[1], new Date(a.split(' ')[0]).getMonth()) - 
+        new Date(b.split(' ')[1], new Date(b.split(' ')[0]).getMonth())
+      );
+      
+      const expenseData = sortedMonths.map(month => monthlyExpenses[month]);
+      
+      expenseChart = new Chart(expenseCtx, {
+        type: 'line',
+        data: {
+          labels: sortedMonths,
+          datasets: [{
+            label: 'Monthly Expenses',
+            data: expenseData,
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            }
+          }
+        }
+      });
+      
+      // Category Distribution Chart
+      const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+      
+      // Group expenses by category
+      const categoryExpenses = {};
+      userExpenses.forEach(expense => {
+        categoryExpenses[expense.category] = (categoryExpenses[expense.category] || 0) + parseFloat(expense.amount);
+      });
+      
+      const categoryLabels = Object.keys(categoryExpenses);
+      const categoryData = Object.values(categoryExpenses);
+      
+      categoryChart = new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+          labels: categoryLabels,
+          datasets: [{
+            data: categoryData,
+            backgroundColor: [
+              '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', 
+              '#64748b', '#ec4899', '#8b5cf6', '#f97316', '#06b6d4'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+            }
+          }
+        }
+      });
+    }
+    
+    // Populate expenses table
+    function populateExpensesTable() {
+      if (userExpenses.length === 0) {
+        expensesTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No expenses found</td></tr>';
+        return;
+      }
+      
+      let tableHTML = '';
+      
+      userExpenses.forEach(expense => {
+        const date = new Date(expense.expense_date);
+        const formattedDate = date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+        
+        tableHTML += `
+          <tr>
+            <td>${expense.title}</td>
+            <td>₹${parseFloat(expense.amount).toFixed(2)}</td>
+            <td>${expense.category}</td>
+            <td>${formattedDate}</td>
+            <td>
+              <button class="action-btn" onclick="editExpense('${expense.id}')">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn" onclick="deleteExpense('${expense.id}')">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      expensesTableBody.innerHTML = tableHTML;
+    }
+    
+    // Update profile page
+    function updateProfilePage() {
+      // Stats are updated in updateDashboardStats()
+    }
+    
+    // Navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const page = this.getAttribute('data-page');
+        
+        // Update active nav item
+        document.querySelectorAll('.nav-link').forEach(item => {
+          item.classList.remove('active');
+        });
+        this.classList.add('active');
+        
+        // Hide all pages
+        document.querySelectorAll('.page').forEach(p => {
+          p.classList.remove('active');
+        });
+        
+        // Show selected page
+        document.getElementById(page).classList.add('active');
+        
+        // Update page title
+        switch(page) {
+          case 'dashboard':
+            pageTitle.textContent = 'Dashboard';
+            break;
+          case 'add-expense':
+            pageTitle.textContent = 'Add Expense';
+            break;
+          case 'view-expenses':
+            pageTitle.textContent = 'View Expenses';
+            break;
+          case 'user-profile':
+            pageTitle.textContent = 'User Profile';
+            break;
+        }
+      });
+    });
+    
+    // Logout functionality
+    logoutBtn.addEventListener('click', function() {
+      localStorage.removeItem('user_email');
+      window.location.href = 'login.html';
+    });
+    
+    // Submit expense
+    submitExpenseBtn.addEventListener('click', async function() {
+      const title = document.getElementById('title').value.trim();
+      const amount = document.getElementById('amount').value.trim();
+      const category = document.getElementById('category').value;
+      const date = document.getElementById('date').value;
+      const notes = document.getElementById('notes').value.trim();
+      const userEmail = localStorage.getItem("user_email");
+      
+      // Basic validation
+      if (!title) {
+        showAlert("Please enter a title for the expense", "error");
+        return;
+      }
+      
+      if (!amount || parseFloat(amount) <= 0) {
+        showAlert("Please enter a valid amount", "error");
+        return;
+      }
+      
+      if (!category) {
+        showAlert("Please select a category", "error");
+        return;
+      }
+      
+      if (!date) {
+        showAlert("Please select a date", "error");
+        return;
+      }
+      
+      // Show loading state
+      const originalText = submitExpenseBtn.innerHTML;
+      submitExpenseBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Expense...';
+      submitExpenseBtn.disabled = true;
+      
+      try {
+        // Insert expense into Supabase
+        const { data, error } = await supabase
+          .from('expenses_mst')
+          .insert([{
+            user_email: userEmail,
+            title: title,
+            amount: amount,
+            category: category,
+            expense_date: date,
+            notes: notes
+          }]);
+
+        if (error) throw error;
+        
+        // Show success message
+        showAlert("✅ Expense added successfully!", "success");
+        
+        // Reset form
+        document.getElementById('expenseForm').reset();
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
+        
+        // Reload expenses
+        await loadExpenses(userEmail);
+        populateExpensesTable();
+        updateDashboardStats();
+        initCharts();
+        
+      } catch (error) {
+        showAlert(`Error: ${error.message}`, "error");
+      } finally {
+        // Reset button
+        submitExpenseBtn.innerHTML = originalText;
+        submitExpenseBtn.disabled = false;
+      }
+    });
+    
+    // Update profile
+    updateProfileBtn.addEventListener('click', async function() {
+      const fullName = document.getElementById('fullName').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const userEmail = localStorage.getItem("user_email");
+      
+      if (!fullName) {
+        showAlert("Please enter your full name", "error");
+        return;
+      }
+      
+      // Show loading state
+      const originalText = updateProfileBtn.innerHTML;
+      updateProfileBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+      updateProfileBtn.disabled = true;
+      
+      try {
+        // Update user profile in Supabase
+        const { data, error } = await supabase
+          .from('user_mst')
+          .update({ 
+            name: fullName,
+            phone: phone
+          })
+          .eq('email', userEmail);
+
+        if (error) throw error;
+        
+        // Update UI
+        profileName.textContent = fullName;
+        userFullName.textContent = fullName;
+        const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        profileInitials.textContent = initials;
+        profileAvatar.textContent = initials;
+        
+        // Show success message
+        showAlert("✅ Profile updated successfully!", "success");
+        
+      } catch (error) {
+        showAlert(`Error: ${error.message}`, "error");
+      } finally {
+        // Reset button
+        updateProfileBtn.innerHTML = originalText;
+        updateProfileBtn.disabled = false;
+      }
+    });
+    
+    // Delete expense
+    async function deleteExpense(expenseId) {
+      if (!confirm("Are you sure you want to delete this expense?")) return;
+      
+      try {
+        const { error } = await supabase
+          .from('expenses_mst')
+          .delete()
+          .eq('id', expenseId);
+
+        if (error) throw error;
+        
+        // Reload expenses
+        const userEmail = localStorage.getItem("user_email");
+        await loadExpenses(userEmail);
+        populateExpensesTable();
+        updateDashboardStats();
+        initCharts();
+        
+        showAlert("✅ Expense deleted successfully!", "success");
+        
+      } catch (error) {
+        showAlert(`Error deleting expense: ${error.message}`, "error");
+      }
+    }
+    
+    // Edit expense (placeholder - would open a modal in a real app)
+    function editExpense(expenseId) {
+      showAlert("Edit functionality would open in a modal with the expense details", "success");
+    }
+    
+    // Show alert message
+    function showAlert(message, type) {
+      alertBox.innerHTML = `
+        <div class="alert ${type} show">
+          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+          ${message}
+        </div>
+      `;
+      
+      // Auto hide after 5 seconds
+      if (type === 'success') {
+        setTimeout(() => {
+          alertBox.innerHTML = '';
+        }, 5000);
+      }
+    }
+    
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
