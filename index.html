@@ -1,448 +1,407 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up | ExpensePro</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      background: linear-gradient(135deg, #1a1f38 0%, #0c0f1d 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 450px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .header {
-      background: rgba(10, 15, 30, 0.8);
-      color: white;
-      padding: 25px;
-      text-align: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .logo-icon {
-      font-size: 2rem;
-      margin-right: 10px;
-      color: #3b82f6;
-    }
-
-    .logo-text {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(to right, #3b82f6, #8b5cf6);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .header h1 {
-      font-size: 1.5rem;
-      font-weight: 500;
-      margin: 10px 0 5px;
-    }
-
-    .header p {
-      font-size: 0.95rem;
-      opacity: 0.7;
-      max-width: 350px;
-      margin: 0 auto;
-      line-height: 1.5;
-    }
-
-    .form-container {
-      padding: 25px;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #e2e8f0;
-      font-size: 0.95rem;
-      padding-left: 5px;
-    }
-
-    .input-container {
-      position: relative;
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #94a3b8;
-      font-size: 1.1rem;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 14px 15px 14px 45px;
-      background: rgba(15, 20, 35, 0.7);
-      border: 1.5px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      outline: none;
-      color: #f1f5f9;
-    }
-
-    .input-group input::placeholder {
-      color: #94a3b8;
-    }
-
-    .input-group input:focus {
-      border-color: rgba(59, 130, 246, 0.5);
-      background: rgba(15, 20, 35, 0.9);
-    }
-
-    .toggle-password {
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #94a3b8;
-      font-size: 1.1rem;
-    }
-
-    .toggle-password:hover {
-      color: #3b82f6;
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 15px;
-      background: linear-gradient(to right, #2563eb, #4f46e5);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-top: 10px;
-    }
-
-    .btn-submit:hover {
-      background: linear-gradient(to right, #1d4ed8, #4338ca);
-      transform: translateY(-2px);
-    }
-
-    .login-links {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 0.95rem;
-      color: #94a3b8;
-    }
-
-    .login-links a {
-      color: #93c5fd;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .login-links a:hover {
-      color: #3b82f6;
-      text-decoration: underline;
-    }
-
-    .terms {
-      display: flex;
-      align-items: flex-start;
-      margin-top: 15px;
-      color: #94a3b8;
-      font-size: 0.85rem;
-    }
-
-    .terms input {
-      margin-right: 8px;
-      margin-top: 3px;
-    }
-
-    .terms a {
-      color: #93c5fd;
-      text-decoration: none;
-    }
-
-    .terms a:hover {
-      text-decoration: underline;
-    }
-
-    .alert {
-      padding: 12px 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      opacity: 0;
-      transform: translateY(-10px);
-      transition: all 0.3s ease;
-    }
-
-    .alert.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .alert.success {
-      background: rgba(22, 101, 52, 0.2);
-      color: #86efac;
-      border-left: 3px solid #22c55e;
-    }
-
-    .alert.error {
-      background: rgba(185, 28, 28, 0.2);
-      color: #fca5a5;
-      border-left: 3px solid #ef4444;
-    }
-
-    .alert i {
-      margin-right: 10px;
-      font-size: 1.2rem;
-    }
-
-    @media (max-width: 480px) {
-      .header {
-        padding: 20px 15px;
-      }
-      
-      .form-container {
-        padding: 20px 15px;
-      }
-      
-      .logo-text {
-        font-size: 1.6rem;
-      }
-      
-      .logo-icon {
-        font-size: 1.8rem;
-      }
-      
-      .header h1 {
-        font-size: 1.3rem;
-      }
-      
-      .input-group input {
-        padding: 12px 12px 12px 40px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | ExpensePro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1f38 0%, #0c0f1d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .header {
+            background: rgba(10, 15, 30, 0.8);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .logo-icon {
+            font-size: 2.5rem;
+            margin-right: 12px;
+            color: #3b82f6;
+        }
+        
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .header h1 {
+            font-size: 1.7rem;
+            font-weight: 500;
+            margin: 15px 0 10px;
+        }
+        
+        .header p {
+            font-size: 1rem;
+            opacity: 0.7;
+            max-width: 350px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            padding-left: 5px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px;
+            background: rgba(15, 20, 35, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+            color: #f1f5f9;
+        }
+        
+        .input-group input::placeholder {
+            color: #94a3b8;
+        }
+        
+        .input-group input:focus {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 14px;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #2563eb, #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+        }
+        
+        .login-links {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+        
+        .login-links a {
+            color: #93c5fd;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .alert.success {
+            background: rgba(22, 101, 52, 0.2);
+            color: #86efac;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .alert.error {
+            background: rgba(185, 28, 28, 0.2);
+            color: #fca5a5;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 15px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .terms input {
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+        
+        .terms a {
+            color: #93c5fd;
+            text-decoration: none;
+        }
+        
+        .terms a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="logo">
-        <div class="logo-icon">
-          <i class="fas fa-chart-line"></i>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">📊</div>
+                <div class="logo-text">ExpensePro</div>
+            </div>
+            <h1>Create Your Account</h1>
+            <p>Join us to take control of your finances</p>
         </div>
-        <div class="logo-text">ExpensePro</div>
-      </div>
-      <h1>Create Your Account</h1>
-      <p>Join us to take control of your finances</p>
+        
+        <div class="form-container">
+            <div id="alertBox"></div>
+            
+            <form id="registrationForm">
+                <div class="input-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="password" placeholder="Create a strong password" required>
+                        <span class="toggle-password" onclick="togglePassword('password')">👁️</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="password-container">
+                        <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                        <span class="toggle-password" onclick="togglePassword('confirmPassword')">👁️</span>
+                    </div>
+                </div>
+                
+                <div class="terms">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                </div>
+                
+                <button type="button" class="btn-submit" onclick="registerUser()">
+                    Create Account
+                </button>
+                
+                <div class="login-links">
+                    <a href="login.html">Already have an account? Sign in</a>
+                </div>
+            </form>
+        </div>
     </div>
-    
-    <div class="form-container">
-      <div id="alertBox"></div>
-      
-      <form id="registrationForm">
-        <div class="input-group">
-          <label for="name">Full Name</label>
-          <div class="input-container">
-            <div class="input-icon">
-              <i class="fas fa-user"></i>
-            </div>
-            <input type="text" id="name" placeholder="Enter your full name" required>
-          </div>
-        </div>
-        
-        <div class="input-group">
-          <label for="email">Email Address</label>
-          <div class="input-container">
-            <div class="input-icon">
-              <i class="fas fa-envelope"></i>
-            </div>
-            <input type="email" id="email" placeholder="Enter your email" required>
-          </div>
-        </div>
-        
-        <div class="input-group">
-          <label for="password">Password</label>
-          <div class="input-container">
-            <div class="input-icon">
-              <i class="fas fa-lock"></i>
-            </div>
-            <input type="password" id="password" placeholder="Create a strong password" required>
-            <span class="toggle-password" onclick="togglePassword('password')">
-              <i class="fas fa-eye"></i>
-            </span>
-          </div>
-        </div>
-        
-        <div class="input-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <div class="input-container">
-            <div class="input-icon">
-              <i class="fas fa-lock"></i>
-            </div>
-            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
-            <span class="toggle-password" onclick="togglePassword('confirmPassword')">
-              <i class="fas fa-eye"></i>
-            </span>
-          </div>
-        </div>
-        
-        <div class="terms">
-          <input type="checkbox" id="terms" required>
-          <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
-        </div>
-        
-        <button type="button" class="btn-submit" onclick="registerUser()">
-          <i class="fas fa-user-plus"></i> Create Account
-        </button>
-        
-        <div class="login-links">
-          <a href="login.html">
-            <i class="fas fa-sign-in-alt"></i> Already have an account? Sign in
-          </a>
-        </div>
-      </form>
-    </div>
-  </div>
 
-  <script>
-    // Show alert message
-    function showAlert(message, type) {
-      const alertBox = document.getElementById('alertBox');
-      alertBox.innerHTML = `
-        <div class="alert ${type} show">
-          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-          ${message}
-        </div>
-      `;
-      
-      // Auto hide after 5 seconds
-      setTimeout(() => {
-        const alert = document.querySelector('.alert');
-        if (alert) {
-          alert.classList.remove('show');
-          setTimeout(() => {
-            alertBox.innerHTML = '';
-          }, 300);
-        }
-      }, 5000);
-    }
-    
-    // Toggle password visibility
-    function togglePassword(fieldId) {
-      const passwordInput = document.getElementById(fieldId);
-      const icon = document.querySelector(`#${fieldId} + .toggle-password i`);
-      
-      if (passwordInput.type === 'password') {
-        passwordInput.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-      } else {
-        passwordInput.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-      }
-    }
-    
-    // Register user function
-    function registerUser() {
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const confirmPassword = document.getElementById("confirmPassword").value.trim();
-      const terms = document.getElementById("terms").checked;
-      
-      // Validate inputs
-      if (!name || !email || !password || !confirmPassword) {
-        showAlert("Please fill in all fields", "error");
-        return;
-      }
-      
-      if (password !== confirmPassword) {
-        showAlert("Passwords do not match", "error");
-        return;
-      }
-      
-      if (!terms) {
-        showAlert("You must agree to the terms and conditions", "error");
-        return;
-      }
-      
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        showAlert("Please enter a valid email address", "error");
-        return;
-      }
-      
-      // Show loading state
-      const submitBtn = document.querySelector('.btn-submit');
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
-      submitBtn.disabled = true;
-      
-      // Simulate registration process
-      setTimeout(() => {
-        // For demo purposes, we'll just show a success message
-        showAlert("Account created successfully! Redirecting to login...", "success");
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+        // Initialize EmailJS with your Public Key
+        emailjs.init("fmqcIYpRVTqu9cMgI");
         
-        // Reset form
-        document.getElementById("registrationForm").reset();
+        // DOM elements
+        const alertBox = document.getElementById('alertBox');
         
-        // Redirect to login after 2 seconds
-        setTimeout(() => {
-          window.location.href = "login.html";
-        }, 2000);
-      }, 1500);
-    }
-    
-    // Initialize event listeners
-    document.addEventListener('DOMContentLoaded', () => {
-      // Enter key functionality
-      document.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          registerUser();
+        function showAlert(message, type) {
+            alertBox.innerHTML = `
+                <div class="alert ${type}">
+                    ${type === 'success' ? '✅' : '⚠️'} ${message}
+                </div>
+            `;
+            
+            // Show alert with animation
+            setTimeout(() => {
+                alertBox.firstChild.style.opacity = '1';
+            }, 10);
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    alert.style.opacity = '0';
+                    setTimeout(() => {
+                        alertBox.innerHTML = '';
+                    }, 300);
+                }
+            }, 5000);
         }
-      });
-    });
-  </script>
+        
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggle = document.querySelector(`#${fieldId} + .toggle-password`);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggle.textContent = '🔒';
+            } else {
+                passwordInput.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+        
+        // Send welcome email via EmailJS
+        function sendWelcomeEmail(name, email) {
+            const serviceID = "service_o2qdlgt";
+            const templateID = "template_vf8t7bn";
+            
+            const templateParams = {
+                to_name: name,
+                to_email: email,
+                message: "Welcome to ExpensePro! Your account has been created successfully."
+            };
+            
+            emailjs.send(serviceID, templateID, templateParams)
+                .then(() => {
+                    console.log('Email sent successfully!');
+                }, (error) => {
+                    console.error('Failed to send email:', error);
+                    // Note: We don't show an error to the user as registration was successful
+                });
+        }
+        
+        // Register user function
+        async function registerUser() {
+            const name = document.getElementById("name").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const confirmPassword = document.getElementById("confirmPassword").value.trim();
+            const terms = document.getElementById("terms").checked;
+            
+            // Validate inputs
+            if (!name || !email || !password || !confirmPassword) {
+                showAlert("Please fill in all fields", "error");
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showAlert("Passwords do not match", "error");
+                return;
+            }
+            
+            if (!terms) {
+                showAlert("You must agree to the terms and conditions", "error");
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showAlert("Please enter a valid email address", "error");
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.querySelector('.btn-submit');
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Simulate registration process (replace with actual API call)
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                // Show success message
+                showAlert("Account created successfully! You will receive a confirmation email shortly.", "success");
+                
+                // Send welcome email
+                sendWelcomeEmail(name, email);
+                
+                // Reset form
+                document.getElementById("registrationForm").reset();
+                
+                // Redirect to login after 3 seconds
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 3000);
+            } catch (error) {
+                showAlert("Registration failed. Please try again.", "error");
+            } finally {
+                // Reset button after 1.5 seconds
+                setTimeout(() => {
+                    submitBtn.textContent = 'Create Account';
+                    submitBtn.disabled = false;
+                }, 1500);
+            }
+        }
+        
+        // Enter key functionality
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                registerUser();
+            }
+        });
+    </script>
 </body>
 </html>
